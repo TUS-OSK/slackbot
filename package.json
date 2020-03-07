@@ -1,0 +1,14 @@
+{
+  "name": "slackbot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": "10.x"
+  },
+  "repository": "git@github.com:ilim0t/slackbot.git",
+  "author": "OSK",
+  "license": "MIT"
+}
