@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "dev": "nodemon index.js",
     "lint": "eslint --fix ."
   },
   "engines": {
@@ -23,12 +24,16 @@
       "pre-commit": "lint-staged"
     }
   },
+  "dependencies": {
+    "@slack/bolt": "^1.7.0"
+  },
   "devDependencies": {
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-prettier": "^3.1.2",
     "husky": "^4.2.3",
     "lint-staged": "^10.0.8",
+    "nodemon": "^2.0.2",
     "prettier": "^1.19.1"
   }
 }
