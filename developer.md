@@ -11,3 +11,9 @@
 - ストレージ オブジェクト閲覧者
 
 [App Engine Admin API](https://console.developers.google.com/apis/library/appengine.googleapis.com) を有効にする必要あり
+
+## Slack Bot
+
+[Bolt](https://slack.dev/bolt/ja-jp/concepts)を用いる
+[入門ガイド](https://slack.dev/bolt/ja-jp/tutorial/getting-started)に従って、
+Event Subscription > Request URL に `https://[GCP_PROJECT_ID].appspot.com/slack/events` を指定する必要あり
