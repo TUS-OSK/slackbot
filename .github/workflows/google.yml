@@ -31,4 +31,5 @@ jobs:
       run: |
         gcloud app deploy \
           --promote \
+          --quiet \
           --project=$GAE_PROJECT
