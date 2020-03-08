@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
-    "lint": "eslint --fix ."
+    "start": "ts-node index.js",
+    "dev": "ts-node-dev --respawn index.js",
+    "lint": "eslint --ext .js,.ts --fix ."
   },
   "engines": {
     "node": "^10.0.0"
@@ -14,7 +14,7 @@
   "author": "OSK",
   "license": "MIT",
   "lint-staged": {
-    "*.js": [
+    "*.{js,ts}": [
       "eslint --fix",
       "git add"
     ]
@@ -25,15 +25,20 @@
     }
   },
   "dependencies": {
-    "@slack/bolt": "^1.7.0"
+    "@slack/bolt": "^1.7.0",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.8.3"
   },
   "devDependencies": {
+    "@types/node": "^13.9.0",
+    "@typescript-eslint/eslint-plugin": "^2.22.0",
+    "@typescript-eslint/parser": "^2.22.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-prettier": "^3.1.2",
     "husky": "^4.2.3",
     "lint-staged": "^10.0.8",
-    "nodemon": "^2.0.2",
-    "prettier": "^1.19.1"
+    "prettier": "^1.19.1",
+    "ts-node-dev": "^1.0.0-pre.44"
   }
 }
