@@ -7,15 +7,13 @@ const app = new App({
 
 const allBots = ["example"];
 
-Promise.all(
-  allBots.map(botName => {
-    new Promise(resolve => {
-      const bot = require(`./bots/${botName}`);
-      resolve(bot(app));
-    });
-  })
-)
-  .then(() => app.start(process.env.PORT || 3000))
-  .then(() => {
-    console.log("⚡️ Bolt app is running!");
-  });
+allBots.forEach(botName => {
+  (async () => {
+    const bot = require(`./bots/${botName}`);
+    return bot(app);
+  })().catch(e => console.error(e));
+});
+
+app.start(process.env.PORT || 3000).then(() => {
+  console.log("⚡️ Bolt app is running!");
+});
