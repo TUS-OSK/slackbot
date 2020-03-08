@@ -1,0 +1,36 @@
+name: Build and Deploy to Google App Engine
+
+on:
+  push:
+    branches: [ master ]
+
+env:
+  GAE_PROJECT: ${{ secrets.GAE_PROJECT }}
+  SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+  SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+
+    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      with:
+        version: "281.0.0"
+        service_account_email: ${{ secrets.GCP_SA_EMAIL }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Variable expansion
+      run: node .github/workflows/variable_expansion.js
+
+    - name: Deploy to App Engine
+      run: |
+        gcloud app deploy \
+          --promote \
+          --stop-previous-version \
+          --quiet \
+          --project=$GAE_PROJECT
