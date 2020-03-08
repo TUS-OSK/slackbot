@@ -10,7 +10,7 @@ let fileData = fs.readFileSync(fileName, "utf8");
 fileData = fileData.replace(/\${\w+}/g, match => {
   const key = match.slice(2, -1);
   if (!(key in process.env)) {
-    throw new ReferenceError(`${fileName}が未定義の環境変数を参照しています。`);
+    throw new ReferenceError(`${fileName}が未定義の環境変数${key}を参照しています。`);
   }
   return process.env[key];
 });
