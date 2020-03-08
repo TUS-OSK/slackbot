@@ -1,6 +1,6 @@
 runtime: nodejs10
 
-service: develop
+service: development
 
 env_variables:
   SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
