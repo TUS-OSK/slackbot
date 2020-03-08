@@ -6,7 +6,7 @@ module.exports = {
     "extends": [
         "eslint:recommended",
         "plugin:prettier/recommended"
-      ],
+    ],
     "globals": {
         "Atomics": "readonly",
         "SharedArrayBuffer": "readonly"
@@ -16,8 +16,22 @@ module.exports = {
         "sourceType": "module"
     },
     "rules": {
-        "prettier/prettier": "error",
         "no-var": "warn",
         "no-unused-vars": "warn"
-    }
+    },
+    "overrides": [
+        {
+            "files": ['**/*.ts'],
+            "extends": [
+                "plugin:@typescript-eslint/eslint-recommended",
+                "plugin:@typescript-eslint/recommended",
+                "prettier/@typescript-eslint"
+            ],
+            "parser": "@typescript-eslint/parser",
+            "plugins": [
+                "@typescript-eslint"
+            ],
+            "rules": {}
+        }
+    ]
 };
