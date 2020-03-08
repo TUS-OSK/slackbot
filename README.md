@@ -20,4 +20,4 @@ yarn run dev
 
 ## Deploy
 
-実装予定
+`master`に push すると自動で deploy されます
