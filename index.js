@@ -9,7 +9,11 @@ const allBots = ["example"];
 
 allBots.forEach(botName => {
   (async () => {
-    const bot = require(`./bots/${botName}`);
+    let bot = require(`./bots/${botName}`);
+    if (typeof bot !== "function") {
+      bot = bot.default;
+    }
+
     return bot(app);
   })().catch(e => console.error(e));
 });
