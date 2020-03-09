@@ -1,5 +1,10 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { App, BlockButtonAction, ViewOutput } from "@slack/bolt";
+import {
+  App,
+  BlockButtonAction,
+  ViewOutput,
+  ViewSubmitAction
+} from "@slack/bolt";
 
 import assert from "assert";
 import { AssertionError } from "assert";
@@ -73,24 +78,27 @@ export default (app: App): void => {
     }
   );
 
-  app.view("poll_view_1", async ({ ack, body, view, context }) => {
-    // モーダルビューでのデータ送信イベントを確認
-    ack();
+  app.view<ViewSubmitAction>(
+    "poll_view_1",
+    async ({ ack, body, view, context }) => {
+      // モーダルビューでのデータ送信イベントを確認
+      ack();
 
-    const user = body.user.id;
-    const numOptions = countNumOptions(view);
+      const user = body.user.id;
+      const numOptions = countNumOptions(view);
 
-    assert(numOptions === Object.keys(view.state.values).length - 1); // titleの分1引く
-    const desiredValues = [
-      "title",
-      ...[...Array(numOptions).keys()].map(i => i + 1).map(i => `option_${i}`)
-    ];
+      assert(numOptions === Object.keys(view.state.values).length - 1); // titleの分1引く
+      const desiredValues = [
+        "title",
+        ...[...Array(numOptions).keys()].map(i => i + 1).map(i => `option_${i}`)
+      ];
 
-    for (const [key, value] of Object.entries(view.state.values)) {
-      assert(desiredValues.includes(key));
-      assert(Object.prototype.hasOwnProperty.call(value, key));
+      for (const [key, value] of Object.entries(view.state.values)) {
+        assert(desiredValues.includes(key));
+        assert(Object.prototype.hasOwnProperty.call(value, key));
 
-      const inputElement: { type: string; value: string } = value.value;
+        const inputElement: { type: string; value: string } = value.value;
+      }
     }
-  });
+  );
 };
