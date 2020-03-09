@@ -17,3 +17,5 @@
 [Bolt](https://slack.dev/bolt/ja-jp/concepts)を用いる
 [入門ガイド](https://slack.dev/bolt/ja-jp/tutorial/getting-started)に従って、
 Event Subscription > Request URL に `https://[GCP_PROJECT_ID].appspot.com/slack/events` を指定する必要あり
+
+Interactivity を ON に
