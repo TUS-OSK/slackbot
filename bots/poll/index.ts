@@ -16,9 +16,9 @@ function assertMybeViewOutput(val: any): asserts val is ViewOutput {
     val === undefined ||
     val === null ||
     typeof val !== "object" ||
-    !Object.prototype.hasOwnProperty.call(val, "id") ||
+    !("id" in val) ||
     typeof val.id !== "string" ||
-    !Object.prototype.hasOwnProperty.call(val, "blocks") ||
+    !("blocks" in val) ||
     typeof val.blocks !== "object"
   ) {
     throw new AssertionError({ message: "Not a ViewOutput!" });
@@ -103,7 +103,7 @@ export default (app: App): void => {
 
       for (const [key, value] of Object.entries(view.state.values)) {
         assert.ok(desiredValues.includes(key));
-        assert.ok(Object.prototype.hasOwnProperty.call(value, key));
+        assert.ok(key in value);
 
         const inputElement: { type: string; value: string } = value[key];
 
