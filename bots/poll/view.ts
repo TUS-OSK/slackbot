@@ -2,12 +2,12 @@
 import { ViewOutput } from "@slack/bolt";
 import { View, Block } from "@slack/web-api";
 
-import assert from "assert";
+import { strict as assert } from "assert";
 
 import baseView from "./base-view.json";
 
 export function buildView(num: number): View {
-  assert(num > 0);
+  assert.ok(num > 0);
   const view = JSON.parse(JSON.stringify(baseView)) as View;
   const deleteOptionBlock = view.blocks.pop() as Block;
   const addOptionBlock = view.blocks.pop() as Block;
@@ -34,7 +34,7 @@ export function buildView(num: number): View {
 }
 
 export function countNumOptions(view: ViewOutput): number {
-  assert(view.blocks.length - 2 >= 0);
+  assert.ok(view.blocks.length - 2 >= 0);
 
   if (view.blocks.length === 3) {
     // 「選択肢を減らす」が無いので
