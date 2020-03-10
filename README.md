@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- [Node.js](https://nodejs.org/ja/): 12.16.1 以上
+- [Node.js](https://nodejs.org/ja/): 10.x
 - [Yarn](https://classic.yarnpkg.com/ja/)
 
 ## Setup
@@ -20,5 +20,5 @@ yarn run dev
 
 ## Deploy
 
-`master`に push すると自動で deploy されます
-`develop`に push すると自動で deploy されます
+`master`に push すると本番環境に自動で deploy されます  
+`develop`に push すると開発自動で deploy されます
