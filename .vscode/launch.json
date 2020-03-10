@@ -5,13 +5,37 @@
   "version": "0.2.0",
   "configurations": [
     {
+      // 変更を検知しても古いソースのまま実行し続ける
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
-      "preLaunchTask": "Compile TypeScript",
-      "program": "${workspaceFolder}/index.js",
-      "skipFiles": ["<node_internals>/**"],
-      "outFiles": ["${workspaceFolder}/build/**/*.js"]
+      "name": "Launch Program(index.js)",
+      "runtimeArgs": ["-r", "ts-node/register"],
+      "args": ["${workspaceFolder}/index.js"],
+      "env": { "TS_NODE_PROJECT": "${workspaceFolder}/tsconfig.json" }
+    },
+    {
+      // attachが少し遅い
+      "type": "node",
+      "request": "launch",
+      "name": "Launch server debug",
+      "program": "${workspaceRoot}/node_modules/ts-node-dev/bin/ts-node-dev",
+      "args": ["--inspect", "--no-notify", "--transpileOnly", "."], // "respawn"
+      "protocol": "inspector",
+      "internalConsoleOptions": "openOnSessionStart",
+      "port": 9229,
+      "restart": true // falseなら変更を検知した際終了する, trueなら変更を検知した際再実行する
+    },
+    {
+      // yarn run debugの事前実行が必要
+      // attachが少し遅い
+      "type": "node",
+      "request": "attach",
+      "name": "Attach TypeScript Server",
+      "protocol": "inspector",
+      "port": 9229,
+      "restart": true,
+      "localRoot": "${workspaceFolder}",
+      "remoteRoot": "."
     }
   ]
 }

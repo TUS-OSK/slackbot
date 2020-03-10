@@ -4,8 +4,10 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node index.js",
+    "build": "tsc",
     "dev": "ts-node-dev --respawn index.js",
-    "lint": "eslint --ext .js,.ts --fix ."
+    "debug": "ts-node-dev --inspect --no-notify --respawn --transpileOnly . index.js",
+    "lint": "eslint --ext .js,.ts --ignore-pattern '/build/' --fix ."
   },
   "engines": {
     "node": "^10.0.0"
