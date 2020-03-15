@@ -23,6 +23,38 @@ export function assertMybeViewOutput(val: any): asserts val is ViewOutput {
   }
 }
 
+export function assertIsDefined<T>(val: T): asserts val is NonNullable<T> {
+  if (val === undefined || val === null) {
+    throw new AssertionError({
+      message: `Expected 'val' to be defined, but received ${val}`
+    });
+  }
+}
+
+export function assertMeybeSectionBlock(
+  val: KnownBlock
+): asserts val is SectionBlock {
+  if (val.type !== "section") {
+    throw new AssertionError({ message: "Not a SectionBlock!" });
+  }
+}
+
+export function assertMeybeContextBlock(
+  val: KnownBlock
+): asserts val is ContextBlock {
+  if (val.type !== "context") {
+    throw new AssertionError({ message: "Not a ContextBlock!" });
+  }
+}
+
+export function assertMaybePlainTextElement(
+  val: ContextBlock["elements"][0]
+): asserts val is PlainTextElement {
+  if (val.type !== "plain_text") {
+    throw new AssertionError({ message: "Not a ContextBlock!" });
+  }
+}
+
 export function assertJSONEqual(actual: string[], expected: string[]): void {
   assert.strictEqual(
     JSON.stringify(actual),
