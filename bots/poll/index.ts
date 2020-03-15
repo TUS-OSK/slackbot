@@ -124,6 +124,21 @@ export default (app: App): void => {
   });
 
   app.action<BlockButtonAction>(
+    "poll_delete",
+    async ({ ack, body, context }) => {
+      ack();
+
+      assertIsDefined(body.channel);
+      assertIsDefined(body.message);
+      await app.client.chat.delete({
+        token: context.botToken,
+        channel: body.channel.id,
+        ts: body.message.ts
+      });
+    }
+  );
+
+  app.action<BlockButtonAction>(
     "poll_vote",
     async ({ action, ack, body, respond }) => {
       ack();
