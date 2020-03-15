@@ -107,6 +107,7 @@ export function buildBlocks(
           emoji: true,
           text: "削除"
         },
+        style: "danger",
         action_id: "poll_delete"
       }
     ]

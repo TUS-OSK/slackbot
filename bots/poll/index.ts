@@ -98,7 +98,7 @@ export default (app: App): void => {
     }
   );
 
-  app.view<ViewSubmitAction>("poll_view_1", async ({ ack, body, view }) => {
+  app.view<ViewSubmitAction>("poll_view_1", ({ ack, body, view }) => {
     // モーダルビューでのデータ送信イベントを確認
     ack();
 
@@ -140,7 +140,7 @@ export default (app: App): void => {
 
   app.action<BlockButtonAction>(
     "poll_vote",
-    async ({ action, ack, body, respond }) => {
+    ({ ack, action, body, respond }) => {
       ack();
 
       const matchedOptionIndex = action.value.match(/^option_(\d+)$/);
@@ -177,7 +177,7 @@ export default (app: App): void => {
       const votersBlocks = oldBlocks
         .slice(2, -2)
         .filter((block, index) => index % 2 === 1);
-      const voters: string[][] = votersBlocks.map(voter => {
+      let voters: string[][] = votersBlocks.map(voter => {
         assertMeybeContextBlock(voter);
         assert.ok(voter.elements.length > 0);
         if (voter.elements.length === 1) {
@@ -190,6 +190,13 @@ export default (app: App): void => {
       });
 
       // vote
+      voters = voters.map(value => {
+        const set = new Set(value);
+        set.delete(body.user.id);
+        const array = Array.from(set);
+        array.sort();
+        return array;
+      });
       assert.ok(optionIndex < voters.length);
       voters[optionIndex].push(body.user.id);
 
