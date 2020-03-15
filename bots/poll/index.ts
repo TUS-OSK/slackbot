@@ -1,29 +1,12 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import {
-  App,
-  BlockButtonAction,
-  ViewOutput,
-  ViewSubmitAction
-} from "@slack/bolt";
+import { App, BlockButtonAction, ViewSubmitAction } from "@slack/bolt";
 
-import { AssertionError, strict as assert } from "assert";
+import { strict as assert } from "assert";
 
-import { buildView, countNumOptions } from "./view";
+import { assertMybeViewOutput } from "./assert";
 import { parseArgs } from "./parser";
 
-function assertMybeViewOutput(val: any): asserts val is ViewOutput {
-  if (
-    val === undefined ||
-    val === null ||
-    typeof val !== "object" ||
-    !("id" in val) ||
-    typeof val.id !== "string" ||
-    !("blocks" in val) ||
-    typeof val.blocks !== "object"
-  ) {
-    throw new AssertionError({ message: "Not a ViewOutput!" });
-  }
-}
+import { buildView, countNumOptions } from "./view";
 
 export default (app: App): void => {
   console.log("/poll を読み込みました。");

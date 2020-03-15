@@ -1,4 +1,5 @@
 import { strict as assert } from "assert";
+import { assertJSONEqual } from "./assert";
 
 export function parseArgs(str: string): string[] {
   assert.ok(!/\$/.test(str));
@@ -24,14 +25,6 @@ export function parseArgs(str: string): string[] {
   const squeezed = encoded.replace(/\s+/g, " ").replace(/(^ | $)/g, "");
   return squeezed.split(" ").map(value => decode(value));
 }
-
-const assertJSONEqual = (actual: string[], expected: string[]): void => {
-  assert.strictEqual(
-    JSON.stringify(actual),
-    JSON.stringify(expected),
-    `${actual}が${expected}と等しくありません。`
-  );
-};
 
 assertJSONEqual(parseArgs(`"hello" test`), ["hello", "test"]);
 assertJSONEqual(parseArgs(` "hello" test`), ["hello", "test"]);
