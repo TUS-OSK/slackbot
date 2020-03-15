@@ -19,7 +19,7 @@ import { buildView, countNumOptions } from "./view";
 export default (app: App): void => {
   console.log("/poll を読み込みました。");
 
-  app.command("/poll", async ({ ack, body, context, say }) => {
+  app.command("/poll", async ({ ack, body, context, respond, say }) => {
     ack();
 
     const { text } = body;
@@ -35,7 +35,25 @@ export default (app: App): void => {
       return;
     }
 
-    const [title, ...options] = parseArgs(text);
+    let title: string, options: string[];
+    try {
+      [title, ...options] = parseArgs(text);
+    } catch {
+      respond({
+        channel: body.channel_id,
+        text: "引数が無効です。",
+        response_type: "ephemeral"
+      });
+      return;
+    }
+    if (options.length === 0) {
+      respond({
+        channel: body.channel_id,
+        text: "選択肢は必ず一つ以上必要です。",
+        response_type: "ephemeral"
+      });
+      return;
+    }
     say({
       channel: body.channel_id,
       text: "text sample", // TODO
