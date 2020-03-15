@@ -6,16 +6,16 @@ import { strict as assert } from "assert";
 import { assertMybeViewOutput } from "./assert";
 import { parseArgs } from "./parser";
 
+import { buildBlocks } from "./blocks";
 import { buildView, countNumOptions } from "./view";
 
 export default (app: App): void => {
   console.log("/poll を読み込みました。");
 
-  app.command("/poll", async ({ ack, body, context }) => {
+  app.command("/poll", async ({ ack, body, context, say }) => {
     ack();
 
     const { text } = body;
-
     if (text === "") {
       const result = await app.client.views.open({
         token: context.botToken,
@@ -29,7 +29,11 @@ export default (app: App): void => {
     }
 
     const [title, ...options] = parseArgs(text);
-    console.log(title, options);
+    say({
+      channel: body.channel_id,
+      text: "text sample",
+      blocks: buildBlocks(title, body.user_id, options)
+    });
   });
 
   app.action<BlockButtonAction>(
