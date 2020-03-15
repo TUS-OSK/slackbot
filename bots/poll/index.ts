@@ -108,7 +108,9 @@ export default (app: App): void => {
     assert.strictEqual(Object.keys(view.state.values).length - 1, numOptions); // titleの分1引く
     const desiredValues = [
       "title",
-      ...[...Array(numOptions).keys()].map(i => i + 1).map(i => `option_${i}`)
+      ...[...new Array(numOptions).keys()]
+        .map(i => i + 1)
+        .map(i => `option_${i}`)
     ];
 
     for (const [key, value] of Object.entries(view.state.values)) {

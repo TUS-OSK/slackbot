@@ -15,7 +15,7 @@ function buildOption(
   option: string,
   optionId: string,
   voters: string[]
-): [SectionBlock, ContextBlock] {
+): { optionBlock: SectionBlock; votersBlock: ContextBlock } {
   const optionBlock: SectionBlock = {
     type: "section",
     text: {
@@ -59,7 +59,7 @@ function buildOption(
     text: voters.length === 0 ? "No votes" : `${voters.length} votes`
   });
 
-  return [optionBlock, votersBlock];
+  return { optionBlock, votersBlock };
 }
 
 export function buildBlocks(
@@ -87,7 +87,7 @@ export function buildBlocks(
   blocks.push(driverBlock);
 
   for (const [index, option] of options.entries()) {
-    const [optionBlock, votersBlock] = buildOption(
+    const { optionBlock, votersBlock } = buildOption(
       option,
       `option_${index}`,
       voters[index]
