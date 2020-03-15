@@ -9,7 +9,7 @@ import {
   assertIsDefined,
   assertMeybeSectionBlock,
   assertMeybeContextBlock,
-  assertMaybePlainTextElement
+  assertMaybeMrkdwnElement
 } from "./assert";
 import { parseArgs } from "./parser";
 
@@ -38,7 +38,7 @@ export default (app: App): void => {
     const [title, ...options] = parseArgs(text);
     say({
       channel: body.channel_id,
-      text: "text sample",
+      text: "text sample", // TODO
       blocks: buildBlocks(title, body.user_id, options)
     });
   });
@@ -114,12 +114,12 @@ export default (app: App): void => {
 
       // extract blocks
       assertIsDefined(body.message);
-      const blocks = body.message.blocks as KnownBlock[]; // TODO:
+      const oldBlocks = body.message.blocks as KnownBlock[]; // TODO:
 
-      assert.ok(blocks.length >= 6);
+      assert.ok(oldBlocks.length >= 6);
 
       // extract title
-      const titleBlock = blocks[0];
+      const titleBlock = oldBlocks[0];
       assertMeybeSectionBlock(titleBlock);
       assertIsDefined(titleBlock.text);
       const matchedTitle = titleBlock.text.text.match(
@@ -129,7 +129,7 @@ export default (app: App): void => {
       const [, title, investigatorId] = matchedTitle;
 
       // extract options
-      const optionBlocks = blocks
+      const optionBlocks = oldBlocks
         .slice(2, -2)
         .filter((block, index) => index % 2 === 0);
       const options = optionBlocks.map(option => {
@@ -139,19 +139,37 @@ export default (app: App): void => {
       });
 
       // extract voters
-      const votersBlocks = blocks
+      const votersBlocks = oldBlocks
         .slice(2, -2)
         .filter((block, index) => index % 2 === 1);
-      const voters = votersBlocks.map(voter => {
+      const voters: string[][] = votersBlocks.map(voter => {
         assertMeybeContextBlock(voter);
         assert.ok(voter.elements.length > 0);
-        return voter.elements.slice(0, -1).map(element => {
-          assertMaybePlainTextElement(element);
-          return element.text;
-        });
+        if (voter.elements.length === 1) {
+          return [];
+        }
+        assertMaybeMrkdwnElement(voter.elements[0]);
+        const voterIds = voter.elements[0].text.match(/<@(\w+)>/g);
+        assertIsDefined(voterIds);
+        return voterIds.map(value => value.slice(2, -1));
       });
 
-      buildBlocks(title, investigatorId, options, voters);
+      // vote
+      assert.ok(optionIndex < voters.length);
+      voters[optionIndex].push(body.user.id);
+
+      // build blocks
+      const blocks = buildBlocks(title, investigatorId, options, voters);
+      assertIsDefined(body.channel);
+      assertIsDefined(body.message);
+      assertIsDefined(body.message.text);
+
+      respond({
+        channel: body.channel.id,
+        text: body.message.text,
+        blocks: blocks,
+        replace_original: true
+      });
     }
   );
 };

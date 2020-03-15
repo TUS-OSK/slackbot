@@ -3,8 +3,7 @@ import {
   KnownBlock,
   SectionBlock,
   ContextBlock,
-  PlainTextElement,
-  View
+  MrkdwnElement
 } from "@slack/web-api";
 
 import { AssertionError, strict as assert } from "assert";
@@ -47,11 +46,11 @@ export function assertMeybeContextBlock(
   }
 }
 
-export function assertMaybePlainTextElement(
+export function assertMaybeMrkdwnElement(
   val: ContextBlock["elements"][0]
-): asserts val is PlainTextElement {
-  if (val.type !== "plain_text") {
-    throw new AssertionError({ message: "Not a ContextBlock!" });
+): asserts val is MrkdwnElement {
+  if (val.type !== "mrkdwn") {
+    throw new AssertionError({ message: "Not a MrkdwnElement!" });
   }
 }
 
