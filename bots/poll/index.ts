@@ -73,29 +73,26 @@ export default (app: App): void => {
     }
   );
 
-  app.view<ViewSubmitAction>(
-    "poll_view_1",
-    async ({ ack, body, view, context }) => {
-      // モーダルビューでのデータ送信イベントを確認
-      ack();
+  app.view<ViewSubmitAction>("poll_view_1", async ({ ack, body, view }) => {
+    // モーダルビューでのデータ送信イベントを確認
+    ack();
 
-      const user = body.user.id;
-      const numOptions = countNumOptions(view);
+    const user = body.user.id;
+    const numOptions = countNumOptions(view);
 
-      assert.strictEqual(Object.keys(view.state.values).length - 1, numOptions); // titleの分1引く
-      const desiredValues = [
-        "title",
-        ...[...Array(numOptions).keys()].map(i => i + 1).map(i => `option_${i}`)
-      ];
+    assert.strictEqual(Object.keys(view.state.values).length - 1, numOptions); // titleの分1引く
+    const desiredValues = [
+      "title",
+      ...[...Array(numOptions).keys()].map(i => i + 1).map(i => `option_${i}`)
+    ];
 
-      for (const [key, value] of Object.entries(view.state.values)) {
-        assert.ok(desiredValues.includes(key));
-        assert.ok(key in value);
+    for (const [key, value] of Object.entries(view.state.values)) {
+      assert.ok(desiredValues.includes(key));
+      assert.ok(key in value);
 
-        const inputElement: { type: string; value: string } = value[key];
+      const inputElement: { type: string; value: string } = value[key];
 
-        // key: inputElement.value
-      }
+      // key: inputElement.value
     }
-  );
+  });
 };
