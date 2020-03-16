@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import {
-  SectionBlock,
   ActionsBlock,
-  DividerBlock,
   ContextBlock,
-  KnownBlock
+  DividerBlock,
+  KnownBlock,
+  SectionBlock
 } from "@slack/web-api";
 
 import { strict as assert } from "assert";

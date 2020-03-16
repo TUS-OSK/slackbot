@@ -1,14 +1,16 @@
 import { ViewOutput } from "@slack/bolt";
 import {
-  KnownBlock,
-  SectionBlock,
   ContextBlock,
-  MrkdwnElement
+  ConversationsSelect,
+  InputBlock,
+  KnownBlock,
+  MrkdwnElement,
+  SectionBlock
 } from "@slack/web-api";
 
 import { AssertionError, strict as assert } from "assert";
 
-export function assertMybeViewOutput(val: any): asserts val is ViewOutput {
+export function assertMaybeViewOutput(val: any): asserts val is ViewOutput {
   if (
     val === undefined ||
     val === null ||
@@ -19,6 +21,12 @@ export function assertMybeViewOutput(val: any): asserts val is ViewOutput {
     typeof val.blocks !== "object"
   ) {
     throw new AssertionError({ message: "Not a ViewOutput!" });
+  }
+}
+
+export function assertIsString(val: any): asserts val is string {
+  if (typeof val !== "string") {
+    throw new AssertionError({ message: "Not a string!" });
   }
 }
 
@@ -51,6 +59,20 @@ export function assertMaybeMrkdwnElement(
 ): asserts val is MrkdwnElement {
   if (val.type !== "mrkdwn") {
     throw new AssertionError({ message: "Not a MrkdwnElement!" });
+  }
+}
+
+export function assertMaybeInputBlock(val: any): asserts val is InputBlock {
+  if (val.type !== "input") {
+    throw new AssertionError({ message: "Not a InputBlock!" });
+  }
+}
+
+export function assertMaybeConversationsSelect(
+  val: any
+): asserts val is ConversationsSelect {
+  if (val.type !== "conversations_select") {
+    throw new AssertionError({ message: "Not a ConversationsSelect!" });
   }
 }
 

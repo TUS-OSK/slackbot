@@ -5,11 +5,15 @@ import { KnownBlock } from "@slack/web-api";
 import { strict as assert } from "assert";
 
 import {
-  assertMybeViewOutput,
   assertIsDefined,
-  assertMeybeSectionBlock,
+  assertIsString,
+  assertJSONEqual,
+  assertMaybeConversationsSelect,
+  assertMaybeInputBlock,
+  assertMaybeMrkdwnElement,
   assertMeybeContextBlock,
-  assertMaybeMrkdwnElement
+  assertMeybeSectionBlock,
+  assertMaybeViewOutput
 } from "./assert";
 import { parseArgs } from "./parser";
 
@@ -24,12 +28,13 @@ export default (app: App): void => {
 
     const { text } = body;
     if (text === "") {
+      // SLack側が "   " などは "" と解釈する
       const result = await app.client.views.open({
         token: context.botToken,
         // 適切な trigger_id を受け取ってから 3 秒以内に渡す
         trigger_id: body.trigger_id,
         // view の値をペイロードに含む
-        view: buildView(2)
+        view: buildView(2, body.channel_id)
       });
       console.log(result);
       return;
@@ -64,15 +69,21 @@ export default (app: App): void => {
   app.action<BlockButtonAction>(
     "poll_add_option",
     async ({ ack, body, context }) => {
-      assertMybeViewOutput(body.view);
+      assertMaybeViewOutput(body.view);
       ack();
 
+      assertMaybeInputBlock(body.view.blocks[0]);
+      assertMaybeConversationsSelect(body.view.blocks[0].element);
+      assertIsDefined(body.view.blocks[0].element.initial_conversation);
       const result = await app.client.views.update({
         token: context.botToken,
         // リクエストに含まれる view_id を渡す
         view_id: body.view.id,
         // 更新された view の値をペイロードに含む
-        view: buildView(countNumOptions(body.view) + 1)
+        view: buildView(
+          countNumOptions(body.view) + 1,
+          body.view.blocks[0].element.initial_conversation
+        )
       });
       console.log(result);
     }
@@ -81,16 +92,20 @@ export default (app: App): void => {
   app.action<BlockButtonAction>(
     "poll_delete_option",
     async ({ ack, body, context }) => {
-      assertMybeViewOutput(body.view);
+      assertMaybeViewOutput(body.view);
       ack();
 
+      assertMaybeInputBlock(body.view.blocks[0]);
+      assertMaybeConversationsSelect(body.view.blocks[0].element);
+      assertIsDefined(body.view.blocks[0].element.initial_conversation);
       const result = await app.client.views.update({
         token: context.botToken,
         // リクエストに含まれる view_id を渡す
         view_id: body.view.id,
         // 更新された view の値をペイロードに含む
         view: buildView(
-          countNumOptions(body.view) > 1 ? countNumOptions(body.view) - 1 : 1
+          countNumOptions(body.view) > 1 ? countNumOptions(body.view) - 1 : 1,
+          body.view.blocks[0].element.initial_conversation
         )
       });
 
@@ -98,29 +113,57 @@ export default (app: App): void => {
     }
   );
 
-  app.view<ViewSubmitAction>("poll_view_1", ({ ack, body, view }) => {
+  app.view<ViewSubmitAction>("poll_view_1", ({ ack, body, context, view }) => {
     // モーダルビューでのデータ送信イベントを確認
     ack();
 
-    const user = body.user.id;
     const numOptions = countNumOptions(view);
-
-    assert.strictEqual(Object.keys(view.state.values).length - 1, numOptions); // titleの分1引く
     const desiredValues = [
+      "conversation",
       "title",
-      ...[...new Array(numOptions).keys()]
-        .map(i => i + 1)
-        .map(i => `option_${i}`)
+      ...Array.from({ length: numOptions }, (value, i) => `option_${i + 1}`)
     ];
 
-    for (const [key, value] of Object.entries(view.state.values)) {
-      assert.ok(desiredValues.includes(key));
-      assert.ok(key in value);
+    const actions: { [actionId: string]: any } = Object.assign(
+      {},
+      ...Object.values(view.state.values)
+    );
+    assertJSONEqual(Object.keys(actions), desiredValues); // titleの分1引く
 
-      const inputElement: { type: string; value: string } = value[key];
+    let conversation = ""; // TODO
+    let title = ""; // TODO
+    const options: string[] = [];
 
-      // key: inputElement.value
+    for (const [key, action] of Object.entries(actions)) {
+      if (key === "conversation") {
+        // assertMaybeConversationsSelect(action);
+        assert.strictEqual(action.type, "conversations_select");
+        assertIsString(action.selected_conversation);
+        conversation = action.selected_conversation;
+        continue;
+      }
+      assert.strictEqual(action.type, "plain_text_input");
+      assertIsString(action.value);
+      if (key === "title") {
+        title = action.value;
+        continue;
+      }
+      const optionIndex = parseInt(key.slice(7)) - 1;
+      assert.ok(0 <= optionIndex);
+      assert.ok(optionIndex < numOptions);
+      options[optionIndex] = action.value; // index以下の未初期化なitemに対し <empty item> が暗黙的に代入されることに注意
     }
+
+    assert.notStrictEqual(conversation, "");
+    assert.notStrictEqual(title, "");
+    assert.strictEqual(options.length, numOptions);
+
+    app.client.chat.postMessage({
+      token: context.botToken,
+      channel: conversation,
+      text: "text sample", // TODO
+      blocks: buildBlocks(title, body.user.id, options)
+    });
   });
 
   app.action<BlockButtonAction>(
