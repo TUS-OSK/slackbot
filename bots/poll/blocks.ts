@@ -9,8 +9,6 @@ import {
 
 import { strict as assert } from "assert";
 
-// import baseBlock from "./base-blocks.json";
-
 function buildOption(
   option: string,
   optionId: string,
@@ -41,7 +39,6 @@ function buildOption(
       // }
     ]
   };
-
   if (voters.length != 0) {
     votersBlock.elements.push({
       type: "mrkdwn",
@@ -88,7 +85,6 @@ export function buildBlocks(
     (accumulator, currentValue) => accumulator + currentValue.length,
     0
   );
-
   for (const [index, option] of options.entries()) {
     const { optionBlock, votersBlock } = buildOption(
       option,
@@ -103,12 +99,7 @@ export function buildBlocks(
 
   const totalNumBlock: ContextBlock = {
     type: "context",
-    elements: [
-      {
-        type: "mrkdwn",
-        text: `計${totalVotersNum}人`
-      }
-    ]
+    elements: [{ type: "mrkdwn", text: `計${totalVotersNum}人` }]
   };
   blocks.push(totalNumBlock);
 
@@ -128,5 +119,6 @@ export function buildBlocks(
     ]
   };
   blocks.push(footerBlock);
+
   return blocks;
 }

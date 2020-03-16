@@ -5,7 +5,8 @@ import {
   InputBlock,
   KnownBlock,
   MrkdwnElement,
-  SectionBlock
+  SectionBlock,
+  View
 } from "@slack/web-api";
 
 import { AssertionError, strict as assert } from "assert";
@@ -62,14 +63,16 @@ export function assertMaybeMrkdwnElement(
   }
 }
 
-export function assertMaybeInputBlock(val: any): asserts val is InputBlock {
+export function assertMaybeInputBlock(
+  val: View["blocks"][0]
+): asserts val is InputBlock {
   if (val.type !== "input") {
     throw new AssertionError({ message: "Not a InputBlock!" });
   }
 }
 
 export function assertMaybeConversationsSelect(
-  val: any
+  val: InputBlock["element"]
 ): asserts val is ConversationsSelect {
   if (val.type !== "conversations_select") {
     throw new AssertionError({ message: "Not a ConversationsSelect!" });

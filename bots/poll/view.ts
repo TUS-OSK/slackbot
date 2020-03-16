@@ -8,6 +8,7 @@ import baseView from "./base-view.json";
 
 export function buildView(num: number, conversation: string): View {
   assert.ok(num > 0);
+
   const view = JSON.parse(JSON.stringify(baseView)) as View;
   const deleteOptionBlock = view.blocks.pop() as ActionsBlock;
   const addOptionBlock = view.blocks.pop() as ActionsBlock;
@@ -40,10 +41,12 @@ export function buildView(num: number, conversation: string): View {
       }
     });
   }
+
   view.blocks.push(addOptionBlock);
   if (num > 1) {
     view.blocks.push(deleteOptionBlock);
   }
+
   return view;
 }
 

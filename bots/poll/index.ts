@@ -29,14 +29,11 @@ export default (app: App): void => {
     const { text } = body;
     if (text === "") {
       // SLack側が "   " などは "" と解釈する
-      const result = await app.client.views.open({
+      await app.client.views.open({
         token: context.botToken,
-        // 適切な trigger_id を受け取ってから 3 秒以内に渡す
         trigger_id: body.trigger_id,
-        // view の値をペイロードに含む
         view: buildView(2, body.channel_id)
       });
-      console.log(result);
       return;
     }
 
@@ -69,40 +66,37 @@ export default (app: App): void => {
   app.action<BlockButtonAction>(
     "poll_add_option",
     async ({ ack, body, context }) => {
-      assertMaybeViewOutput(body.view);
       ack();
 
+      assertMaybeViewOutput(body.view);
       assertMaybeInputBlock(body.view.blocks[0]);
       assertMaybeConversationsSelect(body.view.blocks[0].element);
       assertIsDefined(body.view.blocks[0].element.initial_conversation);
-      const result = await app.client.views.update({
+
+      await app.client.views.update({
         token: context.botToken,
-        // リクエストに含まれる view_id を渡す
         view_id: body.view.id,
-        // 更新された view の値をペイロードに含む
         view: buildView(
           countNumOptions(body.view) + 1,
           body.view.blocks[0].element.initial_conversation
         )
       });
-      console.log(result);
     }
   );
 
   app.action<BlockButtonAction>(
     "poll_delete_option",
     async ({ ack, body, context }) => {
-      assertMaybeViewOutput(body.view);
       ack();
 
+      assertMaybeViewOutput(body.view);
       assertMaybeInputBlock(body.view.blocks[0]);
       assertMaybeConversationsSelect(body.view.blocks[0].element);
       assertIsDefined(body.view.blocks[0].element.initial_conversation);
+
       const result = await app.client.views.update({
         token: context.botToken,
-        // リクエストに含まれる view_id を渡す
         view_id: body.view.id,
-        // 更新された view の値をペイロードに含む
         view: buildView(
           countNumOptions(body.view) > 1 ? countNumOptions(body.view) - 1 : 1,
           body.view.blocks[0].element.initial_conversation
@@ -113,58 +107,58 @@ export default (app: App): void => {
     }
   );
 
-  app.view<ViewSubmitAction>("poll_view_1", ({ ack, body, context, view }) => {
-    // モーダルビューでのデータ送信イベントを確認
-    ack();
+  app.view<ViewSubmitAction>(
+    "poll_view_1",
+    async ({ ack, body, context, view }) => {
+      ack();
 
-    const numOptions = countNumOptions(view);
-    const desiredValues = [
-      "conversation",
-      "title",
-      ...Array.from({ length: numOptions }, (value, i) => `option_${i + 1}`)
-    ];
+      const numOptions = countNumOptions(view);
+      const desiredValues = [
+        "conversation",
+        "title",
+        ...Array.from({ length: numOptions }, (value, i) => `option_${i + 1}`)
+      ];
+      const actions: { [actionId: string]: any } = Object.assign(
+        {},
+        ...Object.values(view.state.values)
+      );
 
-    const actions: { [actionId: string]: any } = Object.assign(
-      {},
-      ...Object.values(view.state.values)
-    );
-    assertJSONEqual(Object.keys(actions), desiredValues); // titleの分1引く
+      assertJSONEqual(Object.keys(actions), desiredValues); // titleの分1引く
 
-    let conversation = ""; // TODO
-    let title = ""; // TODO
-    const options: string[] = [];
-
-    for (const [key, action] of Object.entries(actions)) {
-      if (key === "conversation") {
-        // assertMaybeConversationsSelect(action);
-        assert.strictEqual(action.type, "conversations_select");
-        assertIsString(action.selected_conversation);
-        conversation = action.selected_conversation;
-        continue;
+      let conversation = ""; // TODO
+      let title = ""; // TODO
+      const options: string[] = [];
+      for (const [key, action] of Object.entries(actions)) {
+        if (key === "conversation") {
+          assert.strictEqual(action.type, "conversations_select");
+          assertIsString(action.selected_conversation);
+          conversation = action.selected_conversation;
+          continue;
+        }
+        assert.strictEqual(action.type, "plain_text_input");
+        assertIsString(action.value);
+        if (key === "title") {
+          title = action.value;
+          continue;
+        }
+        const optionIndex = parseInt(key.slice(7)) - 1;
+        assert.ok(0 <= optionIndex);
+        assert.ok(optionIndex < numOptions);
+        options[optionIndex] = action.value; // index以下の未初期化なitemに対し <empty item> が暗黙的に代入されることに注意
       }
-      assert.strictEqual(action.type, "plain_text_input");
-      assertIsString(action.value);
-      if (key === "title") {
-        title = action.value;
-        continue;
-      }
-      const optionIndex = parseInt(key.slice(7)) - 1;
-      assert.ok(0 <= optionIndex);
-      assert.ok(optionIndex < numOptions);
-      options[optionIndex] = action.value; // index以下の未初期化なitemに対し <empty item> が暗黙的に代入されることに注意
+
+      assert.notStrictEqual(conversation, "");
+      assert.notStrictEqual(title, "");
+      assert.strictEqual(options.length, numOptions);
+
+      await app.client.chat.postMessage({
+        token: context.botToken,
+        channel: conversation,
+        text: "text sample", // TODO
+        blocks: buildBlocks(title, body.user.id, options)
+      });
     }
-
-    assert.notStrictEqual(conversation, "");
-    assert.notStrictEqual(title, "");
-    assert.strictEqual(options.length, numOptions);
-
-    app.client.chat.postMessage({
-      token: context.botToken,
-      channel: conversation,
-      text: "text sample", // TODO
-      blocks: buildBlocks(title, body.user.id, options)
-    });
-  });
+  );
 
   app.action<BlockButtonAction>(
     "poll_delete",
@@ -173,6 +167,7 @@ export default (app: App): void => {
 
       assertIsDefined(body.channel);
       assertIsDefined(body.message);
+
       await app.client.chat.delete({
         token: context.botToken,
         channel: body.channel.id,
@@ -245,6 +240,7 @@ export default (app: App): void => {
 
       // build blocks
       const blocks = buildBlocks(title, investigatorId, options, voters);
+
       assertIsDefined(body.channel);
       assertIsDefined(body.message);
       assertIsDefined(body.message.text);
