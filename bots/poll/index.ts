@@ -58,7 +58,7 @@ export default (app: App): void => {
     }
     say({
       channel: body.channel_id,
-      text: "text sample", // TODO
+      text: `[投票] ${title}`,
       blocks: buildBlocks(title, body.user_id, options)
     });
   });
@@ -125,8 +125,8 @@ export default (app: App): void => {
 
       assertJSONEqual(Object.keys(actions), desiredValues); // titleの分1引く
 
-      let conversation = ""; // TODO
-      let title = ""; // TODO
+      let conversation = "";
+      let title = "";
       const options: string[] = [];
       for (const [key, action] of Object.entries(actions)) {
         if (key === "conversation") {
@@ -154,7 +154,7 @@ export default (app: App): void => {
       await app.client.chat.postMessage({
         token: context.botToken,
         channel: conversation,
-        text: "text sample", // TODO
+        text: `[投票] ${title}`,
         blocks: buildBlocks(title, body.user.id, options)
       });
     }
