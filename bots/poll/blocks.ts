@@ -114,7 +114,21 @@ export function buildBlocks(
           text: "削除"
         },
         style: "danger",
-        action_id: "poll_delete"
+        action_id: "poll_delete",
+        confirm: {
+          title: {
+            type: "plain_text",
+            text: "確認"
+          },
+          text: {
+            type: "plain_text",
+            text: "本当に削除しますか？"
+          },
+          confirm: {
+            type: "plain_text",
+            text: "削除"
+          }
+        }
       }
     ]
   };
