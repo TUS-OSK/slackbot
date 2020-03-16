@@ -165,7 +165,7 @@ export default (app: App): void => {
 
       // extract options
       const optionBlocks = oldBlocks
-        .slice(2, -2)
+        .slice(2, -3)
         .filter((block, index) => index % 2 === 0);
       const options = optionBlocks.map(option => {
         assertMeybeSectionBlock(option);
@@ -175,7 +175,7 @@ export default (app: App): void => {
 
       // extract voters
       const votersBlocks = oldBlocks
-        .slice(2, -2)
+        .slice(2, -3)
         .filter((block, index) => index % 2 === 1);
       let voters: string[][] = votersBlocks.map(voter => {
         assertMeybeContextBlock(voter);

@@ -14,21 +14,15 @@ import { strict as assert } from "assert";
 function buildOption(
   option: string,
   optionId: string,
-  voters: string[]
+  voters: string[],
+  totalVotersNum: number
 ): { optionBlock: SectionBlock; votersBlock: ContextBlock } {
   const optionBlock: SectionBlock = {
     type: "section",
-    text: {
-      type: "mrkdwn",
-      text: `${option}`
-    },
+    text: { type: "mrkdwn", text: `${option}` },
     accessory: {
       type: "button",
-      text: {
-        type: "plain_text",
-        emoji: true,
-        text: "投票"
-      },
+      text: { type: "plain_text", emoji: true, text: "投票" },
       action_id: "poll_vote",
       value: optionId
     }
@@ -56,7 +50,10 @@ function buildOption(
   votersBlock.elements.push({
     type: "plain_text",
     emoji: true,
-    text: voters.length === 0 ? "No votes" : `${voters.length} votes`
+    text: `${voters.length}人(${(
+      (voters.length / totalVotersNum) *
+      100
+    ).toFixed(1)}%)が投票`
   });
 
   return { optionBlock, votersBlock };
@@ -70,9 +67,7 @@ export function buildBlocks(
 ): KnownBlock[] {
   assert.strictEqual(voters.length, options.length);
 
-  const driverBlock: DividerBlock = {
-    type: "divider"
-  };
+  const driverBlock: DividerBlock = { type: "divider" };
 
   const blocks = [];
 
@@ -86,16 +81,33 @@ export function buildBlocks(
   blocks.push(titleBlock);
   blocks.push(driverBlock);
 
+  const totalVotersNum = voters.reduce(
+    (accumulator, currentValue) => accumulator + currentValue.length,
+    0
+  );
+
   for (const [index, option] of options.entries()) {
     const { optionBlock, votersBlock } = buildOption(
       option,
       `option_${index}`,
-      voters[index]
+      voters[index],
+      totalVotersNum
     );
     blocks.push(optionBlock);
     blocks.push(votersBlock);
   }
   blocks.push(driverBlock);
+
+  const totalNumBlock: ContextBlock = {
+    type: "context",
+    elements: [
+      {
+        type: "mrkdwn",
+        text: `計${totalVotersNum}人`
+      }
+    ]
+  };
+  blocks.push(totalNumBlock);
 
   const footerBlock: ActionsBlock = {
     type: "actions",
