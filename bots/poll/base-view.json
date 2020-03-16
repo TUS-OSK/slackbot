@@ -1,0 +1,53 @@
+{
+  "type": "modal",
+  "callback_id": "poll_view_1",
+  "title": {
+    "type": "plain_text",
+    "text": "投票機能 :bar_chart:",
+    "emoji": true
+  },
+  "submit": {
+    "type": "plain_text",
+    "text": "送信",
+    "emoji": true
+  },
+  "blocks": [
+    {
+      "type": "input",
+      "element": {
+        "type": "plain_text_input",
+        "action_id": "title"
+      },
+      "label": {
+        "type": "plain_text",
+        "text": "タイトル"
+      }
+    },
+    {
+      "type": "actions",
+      "elements": [
+        {
+          "type": "button",
+          "action_id": "poll_add_option",
+          "text": {
+            "type": "plain_text",
+            "text": "選択肢を増やす"
+          }
+        }
+      ]
+    },
+    {
+      "type": "actions",
+      "elements": [
+        {
+          "type": "button",
+          "action_id": "poll_delete_option",
+          "text": {
+            "type": "plain_text",
+            "text": "選択肢を減らす"
+          }
+        }
+      ]
+    }
+  ]
+}

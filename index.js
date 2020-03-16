@@ -5,7 +5,7 @@ const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET
 });
 
-const allBots = ["example"];
+const allBots = ["poll"];
 
 allBots.forEach(botName => {
   (async () => {
@@ -16,6 +16,11 @@ allBots.forEach(botName => {
 
     return bot(app);
   })().catch(e => console.error(e));
+});
+
+app.error(error => {
+  // メッセージ再送信もしくはアプリを停止するかの判断をするためにエラーの詳細を出力して確認
+  console.error(error);
 });
 
 app.start(process.env.PORT || 3000).then(() => {
