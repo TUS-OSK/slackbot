@@ -17,6 +17,8 @@ function buildOption(
   voters: string[],
   totalVotersNum: number
 ): { optionBlock: SectionBlock; votersBlock: ContextBlock } {
+  assert.ok(voters.length <= totalVotersNum);
+
   const optionBlock: SectionBlock = {
     type: "section",
     text: { type: "mrkdwn", text: `${option}` },
@@ -50,10 +52,11 @@ function buildOption(
   votersBlock.elements.push({
     type: "plain_text",
     emoji: true,
-    text: `${voters.length}人(${(
-      (voters.length / totalVotersNum) *
-      100
-    ).toFixed(1)}%)が投票`
+    text: `${voters.length}人${
+      totalVotersNum === 0
+        ? ""
+        : `(${((voters.length / totalVotersNum) * 100).toFixed(1)}%)`
+    }が投票`
   });
 
   return { optionBlock, votersBlock };
