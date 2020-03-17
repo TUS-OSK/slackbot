@@ -1,25 +1,35 @@
 const { App } = require("@slack/bolt");
 
+const assert = require("assert").strict;
+
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET
 });
 
-const allBots = ["poll"];
+// export default (ES2015) と module.exports (CommonJS)
+// どちらのexportもサポートするための関数
+function importModule(module) {
+  const mod = require(module);
+  return mod && mod.__esModule ? mod.default : mod;
+}
 
-allBots.forEach(botName => {
-  (async () => {
-    let bot = require(`./bots/${botName}`);
-    if (typeof bot !== "function") {
-      bot = bot.default;
-    }
+// botsを並列読み込み
+const bots = ["poll"];
 
-    return bot(app);
-  })().catch(e => console.error(e));
+bots.forEach(async botName => {
+  console.log(`${botName}を読み込みます`);
+  const bot = importModule(`./bots/${botName}`);
+  assert.strictEqual(typeof bot, "function");
+
+  try {
+    await bot(app);
+  } catch (e) {
+    console.error(`${botName}がクラッシュしました`, e);
+  }
 });
 
 app.error(error => {
-  // メッセージ再送信もしくはアプリを停止するかの判断をするためにエラーの詳細を出力して確認
   console.error(error);
 });
 
