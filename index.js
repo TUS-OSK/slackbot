@@ -1,10 +1,15 @@
-const { App } = require("@slack/bolt");
-
+const { App, ExpressReceiver } = require("@slack/bolt");
 const assert = require("assert").strict;
+
+const logViewer = require("./log-viewer");
+
+const expressReceiver = new ExpressReceiver({
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+});
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  receiver: expressReceiver,
 });
 
 // export default (ES2015) と module.exports (CommonJS)
@@ -28,6 +33,8 @@ bots.forEach(async (botName) => {
     console.error(`${botName}がクラッシュしました`, e);
   }
 });
+
+expressReceiver.app.use("/log-viewer", logViewer);
 
 app.error((error) => {
   console.error(error);
