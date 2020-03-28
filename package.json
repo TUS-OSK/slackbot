@@ -28,11 +28,15 @@
   },
   "dependencies": {
     "@slack/bolt": "^1.7.0",
+    "morgan": "^1.10.0",
+    "pug": "^2.0.4",
     "ts-node": "^8.6.2",
     "typescript": "^3.8.3"
   },
   "devDependencies": {
+    "@types/morgan": "^1.9.0",
     "@types/node": "^13.9.0",
+    "@types/pug": "^2.0.4",
     "@typescript-eslint/eslint-plugin": "^2.22.0",
     "@typescript-eslint/parser": "^2.22.0",
     "eslint": "^6.8.0",

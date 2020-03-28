@@ -1,0 +1,22 @@
+html
+  head
+    meta(charset='utf-8')
+    title= channel
+    link(rel='stylesheet', href="static/style.css")
+  body
+    #slack-archive-viewer
+      #sidebar
+        ul.list#channel-list
+          each channel in channels
+            if channel.name==currentChannel
+               li.channel#active-channel
+                  a(href=channel.name) #{channel.name}
+            else
+              li.channel
+                a(href=channel.name) #{channel.name}
+      #message-view
+        ul.list#message-list
+         each message in messages
+          li #{message.text}
+  
+    script(src="static/scripts.js")
