@@ -8,15 +8,26 @@ html
       #sidebar
         ul.list#channel-list
           each channel in channels
-            if channel.name==currentChannel
-               li.channel#active-channel
-                  a(href=encodeURIComponent(channel.name)) #{channel.name}
-            else
-              li.channel
-                a(href=encodeURIComponent(channel.name)) #{channel.name}
+            li.channel(id=channel.name===currentChannel ? "active-channel" : "")
+              a(href=encodeURIComponent(channel.name)) #{channel.name}
+              // channel名の前に#をつけるべき
       #message-view
-        ul.list#message-list
          each message in messages
-          li #{message.text}
-  
+          .message-container(class=message.subtype || "")
+            div(id=message.ts)
+              img.user_icon(src=users.get(message.user).profile.image_48, alt="")
+              // image_48はまだtypedでない
+              .message
+                .username #{users.get(message.user).profile.display_name || users.get(message.user).real_name}
+                a(href=message.ts)
+                 .time #{new Date(parseFloat(message.ts)*1000).toLocaleString()}
+                //- p #{users.get(message.user).id}
+                .msg #{message.text}
+                  // attachment
+                  // file
+                  //reaction
+                  if message.reactions
+                    each reaction in message.reactions
+                      .message-reaction :#{reaction.name}: #{reaction.users.map(user => users.get(user).profile.display_name || users.get(user).real_name).join(", ")}
+
     script(src="../static/scripts.js")

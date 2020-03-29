@@ -33,16 +33,32 @@ export default async function (app: App): Promise<express.Router> {
   assertIsDefined(SLACK_CLIENT_SECRET);
   assertIsDefined(logDir);
 
-  const channels = await loadChannels(logDir); // TODO: catch
-  const users = await loadUsers(logDir); // TODO: catch
-  const messages: {
-    [key: string]: Message[];
-  } = (
+  const users = await loadUsers(logDir).then(
+    (users) => new Map(users.map((user) => [user.id, user]))
+  );
+
+  const channels = await loadChannels(logDir).then((channels) => {
+    channels.sort((a, b) => {
+      const nameA = a.name.toUpperCase(); // 大文字と小文字を無視する
+      const nameB = b.name.toUpperCase(); // 大文字と小文字を無視する
+      if (nameA < nameB) return -1;
+      if (nameA > nameB) return 1;
+      // names must be equal
+      return 0;
+    });
+    return new Map(channels.map((channel) => [channel.name, channel]));
+  }); // TODO: catch
+
+  const messages = new Map(
     await Promise.all(
-      channels.map((channnel) => loadMessages(path.join(logDir, channnel.name)))
-    )
-  ) // TODO: catch
-    .reduce((acc, cur, index) => ({ ...acc, [channels[index].name]: cur }), {}); // keyに変数を使うときは[]で囲う
+      Array.from(channels.keys()).map(
+        async (channelName): Promise<[string, Message[]]> => [
+          channelName,
+          await loadMessages(path.join(logDir, channelName)),
+        ]
+      )
+    ) // TODO: catch
+  );
 
   const router = express.Router();
 
@@ -53,7 +69,7 @@ export default async function (app: App): Promise<express.Router> {
   router.use(
     cookieSession({
       name: "session",
-      keys: new Keygrip(["key1"], "SHA384", "base64"),
+      keys: new Keygrip(["key1"], "SHA384", "base64"), // TODO 変数化
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     })
   );
@@ -108,7 +124,9 @@ export default async function (app: App): Promise<express.Router> {
   });
 
   router.get("/", (req, res) => {
-    const generals = channels.filter((channel) => channel.is_general);
+    const generals = Array.from(channels.values()).filter(
+      (channel) => channel.is_general
+    );
     assert.strictEqual(generals.length, 1);
 
     res.redirect(`${req.baseUrl}/channel/${generals[0].name}`);
@@ -118,11 +136,7 @@ export default async function (app: App): Promise<express.Router> {
     assertIsDefined(req.session);
 
     if (!req.session.user) {
-      res.redirect(
-        `${req.baseUrl.split("/", 2).join("/")}/login?state=${req.path.slice(
-          1
-        )}`
-      );
+      res.redirect(`../login?state=${req.path.slice(1)}`);
       return;
     }
     next();
@@ -130,7 +144,7 @@ export default async function (app: App): Promise<express.Router> {
 
   router.get("/channel/:channelName", (req, res) => {
     const { channelName } = req.params;
-    if (!channels.map((channel) => channel.name).includes(channelName)) {
+    if (!channels.has(channelName)) {
       res.sendStatus(404);
       return;
     }
@@ -138,8 +152,9 @@ export default async function (app: App): Promise<express.Router> {
     res.send(
       pug.renderFile(path.join(__dirname, "views", "index.pug"), {
         currentChannel: channelName,
-        channels: channels,
-        messages: messages[channelName],
+        channels: Array.from(channels.values()),
+        messages: messages.get(channelName),
+        users: users,
       })
     );
   });
