@@ -34,7 +34,8 @@ bots.forEach(async (botName) => {
   }
 });
 
-logViewer().then(router => expressReceiver.app.use("/log-viewer", router));
+expressReceiver.app.set("trust proxy", 1); // trust first proxy
+logViewer(app).then((router) => expressReceiver.app.use("/log-viewer", router));
 
 app.error((error) => {
   console.error(error);
