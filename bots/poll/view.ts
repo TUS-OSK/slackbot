@@ -18,13 +18,13 @@ export function buildView(num: number, conversation: string): View {
     element: {
       type: "conversations_select",
       initial_conversation: conversation,
-      action_id: "conversation"
+      action_id: "conversation",
     },
     label: {
       type: "plain_text",
       text: "送信先",
-      emoji: true
-    }
+      emoji: true,
+    },
   };
   view.blocks.unshift(conversationBlock);
 
@@ -33,12 +33,12 @@ export function buildView(num: number, conversation: string): View {
       type: "input",
       element: {
         type: "plain_text_input",
-        action_id: `option_${i}`
+        action_id: `option_${i}`,
       },
       label: {
         type: "plain_text",
-        text: `選択肢${i}`
-      }
+        text: `選択肢${i}`,
+      },
     });
   }
 

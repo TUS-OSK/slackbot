@@ -13,7 +13,7 @@ import {
   assertMaybeMrkdwnElement,
   assertMeybeContextBlock,
   assertMeybeSectionBlock,
-  assertMaybeViewOutput
+  assertMaybeViewOutput,
 } from "./assert";
 import { parseArgs } from "./parser";
 
@@ -32,7 +32,7 @@ export default (app: App): void => {
       await app.client.views.open({
         token: context.botToken,
         trigger_id: body.trigger_id,
-        view: buildView(2, body.channel_id)
+        view: buildView(2, body.channel_id),
       });
       return;
     }
@@ -44,7 +44,7 @@ export default (app: App): void => {
       respond({
         channel: body.channel_id,
         text: "引数が無効です。",
-        response_type: "ephemeral"
+        response_type: "ephemeral",
       });
       return;
     }
@@ -52,14 +52,14 @@ export default (app: App): void => {
       respond({
         channel: body.channel_id,
         text: "選択肢は必ず一つ以上必要です。",
-        response_type: "ephemeral"
+        response_type: "ephemeral",
       });
       return;
     }
     say({
       channel: body.channel_id,
       text: `[投票] ${title}`,
-      blocks: buildBlocks(title, body.user_id, options)
+      blocks: buildBlocks(title, body.user_id, options),
     });
   });
 
@@ -79,7 +79,7 @@ export default (app: App): void => {
         view: buildView(
           countNumOptions(body.view) + 1,
           body.view.blocks[0].element.initial_conversation
-        )
+        ),
       });
     }
   );
@@ -100,7 +100,7 @@ export default (app: App): void => {
         view: buildView(
           countNumOptions(body.view) > 1 ? countNumOptions(body.view) - 1 : 1,
           body.view.blocks[0].element.initial_conversation
-        )
+        ),
       });
 
       console.log(result);
@@ -116,7 +116,7 @@ export default (app: App): void => {
       const desiredValues = [
         "conversation",
         "title",
-        ...Array.from({ length: numOptions }, (value, i) => `option_${i + 1}`)
+        ...Array.from({ length: numOptions }, (value, i) => `option_${i + 1}`),
       ];
       const actions: { [actionId: string]: any } = Object.assign(
         {},
@@ -155,7 +155,7 @@ export default (app: App): void => {
         token: context.botToken,
         channel: conversation,
         text: `[投票] ${title}`,
-        blocks: buildBlocks(title, body.user.id, options)
+        blocks: buildBlocks(title, body.user.id, options),
       });
     }
   );
@@ -171,7 +171,7 @@ export default (app: App): void => {
       await app.client.chat.delete({
         token: context.botToken,
         channel: body.channel.id,
-        ts: body.message.ts
+        ts: body.message.ts,
       });
     }
   );
@@ -205,7 +205,7 @@ export default (app: App): void => {
       const optionBlocks = oldBlocks
         .slice(2, -3)
         .filter((block, index) => index % 2 === 0);
-      const options = optionBlocks.map(option => {
+      const options = optionBlocks.map((option) => {
         assertMeybeSectionBlock(option);
         assertIsDefined(option.text);
         return option.text.text;
@@ -215,7 +215,7 @@ export default (app: App): void => {
       const votersBlocks = oldBlocks
         .slice(2, -3)
         .filter((block, index) => index % 2 === 1);
-      let voters: string[][] = votersBlocks.map(voter => {
+      let voters: string[][] = votersBlocks.map((voter) => {
         assertMeybeContextBlock(voter);
         assert.ok(voter.elements.length > 0);
         if (voter.elements.length === 1) {
@@ -224,11 +224,11 @@ export default (app: App): void => {
         assertMaybeMrkdwnElement(voter.elements[0]);
         const voterIds = voter.elements[0].text.match(/<@(\w+)>/g);
         assertIsDefined(voterIds);
-        return voterIds.map(value => value.slice(2, -1));
+        return voterIds.map((value) => value.slice(2, -1));
       });
 
       // vote
-      voters = voters.map(value => {
+      voters = voters.map((value) => {
         const set = new Set(value);
         set.delete(body.user.id);
         const array = Array.from(set);
@@ -249,7 +249,7 @@ export default (app: App): void => {
         channel: body.channel.id,
         text: body.message.text,
         blocks: blocks,
-        replace_original: true
+        replace_original: true,
       });
     }
   );

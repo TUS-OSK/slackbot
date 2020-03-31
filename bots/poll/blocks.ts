@@ -4,7 +4,7 @@ import {
   ContextBlock,
   DividerBlock,
   KnownBlock,
-  SectionBlock
+  SectionBlock,
 } from "@slack/web-api";
 
 import { strict as assert } from "assert";
@@ -24,8 +24,8 @@ function buildOption(
       type: "button",
       text: { type: "plain_text", emoji: true, text: "投票" },
       action_id: "poll_vote",
-      value: optionId
-    }
+      value: optionId,
+    },
   };
 
   const votersBlock: ContextBlock = {
@@ -37,12 +37,12 @@ function buildOption(
       //     "https://api.slack.com/img/blocks/bkb_template_images/profile_4.png",
       //   alt_text: "Angela"
       // }
-    ]
+    ],
   };
   if (voters.length != 0) {
     votersBlock.elements.push({
       type: "mrkdwn",
-      text: voters.map(voter => `<@${voter}>`).join(" ")
+      text: voters.map((voter) => `<@${voter}>`).join(" "),
     });
   }
 
@@ -53,7 +53,7 @@ function buildOption(
       totalVotersNum === 0
         ? ""
         : `(${((voters.length / totalVotersNum) * 100).toFixed(1)}%)`
-    }が投票`
+    }が投票`,
   });
 
   return { optionBlock, votersBlock };
@@ -75,8 +75,8 @@ export function buildBlocks(
     type: "section",
     text: {
       type: "mrkdwn",
-      text: `*${title}* (<@${investigatorId}>による投票)`
-    }
+      text: `*${title}* (<@${investigatorId}>による投票)`,
+    },
   };
   blocks.push(titleBlock);
   blocks.push(driverBlock);
@@ -99,7 +99,7 @@ export function buildBlocks(
 
   const totalNumBlock: ContextBlock = {
     type: "context",
-    elements: [{ type: "mrkdwn", text: `計${totalVotersNum}人` }]
+    elements: [{ type: "mrkdwn", text: `計${totalVotersNum}人` }],
   };
   blocks.push(totalNumBlock);
 
@@ -111,26 +111,26 @@ export function buildBlocks(
         text: {
           type: "plain_text",
           emoji: true,
-          text: "削除"
+          text: "削除",
         },
         style: "danger",
         action_id: "poll_delete",
         confirm: {
           title: {
             type: "plain_text",
-            text: "確認"
+            text: "確認",
           },
           text: {
             type: "plain_text",
-            text: "本当に削除しますか？"
+            text: "本当に削除しますか？",
           },
           confirm: {
             type: "plain_text",
-            text: "削除"
-          }
-        }
-      }
-    ]
+            text: "削除",
+          },
+        },
+      },
+    ],
   };
   blocks.push(footerBlock);
 

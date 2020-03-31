@@ -12,6 +12,6 @@ export default (app: App): void => {
   // app.client を https://slack.dev/node-slack-sdk/web-api の WebClient と同様に扱える
   app.client.chat.postMessage({
     text: "Hello world!",
-    channel: "<conversationId>"
+    channel: "<conversationId>",
   });
 };
