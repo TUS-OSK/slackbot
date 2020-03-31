@@ -4,7 +4,7 @@ const assert = require("assert").strict;
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
 // export default (ES2015) と module.exports (CommonJS)
@@ -17,7 +17,7 @@ function importModule(module) {
 // botsを並列読み込み
 const bots = ["poll"];
 
-bots.forEach(async botName => {
+bots.forEach(async (botName) => {
   console.log(`${botName}を読み込みます`);
   const bot = importModule(`./bots/${botName}`);
   assert.strictEqual(typeof bot, "function");
@@ -29,7 +29,7 @@ bots.forEach(async botName => {
   }
 });
 
-app.error(error => {
+app.error((error) => {
   console.error(error);
 });
 

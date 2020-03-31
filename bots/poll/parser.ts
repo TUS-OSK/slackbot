@@ -23,7 +23,7 @@ export function parseArgs(str: string): string[] {
   };
 
   const squeezed = encoded.replace(/\s+/g, " ").replace(/(^ | $)/g, "");
-  return squeezed.split(" ").map(value => decode(value));
+  return squeezed.split(" ").map((value) => decode(value));
 }
 
 assertJSONEqual(parseArgs(`"hello" test`), ["hello", "test"]);
@@ -42,7 +42,7 @@ assertJSONEqual(parseArgs(` "he'll'o" 'he"ll"o2'  "he 'll' o" 'he "ll" o2'`), [
   "he'll'o",
   `he"ll"o2`,
   `he 'll' o`,
-  `he "ll" o2`
+  `he "ll" o2`,
 ]);
 assertJSONEqual(parseArgs(`'he"ll"o'"he'll'o2"`), [`he"ll"ohe'll'o2`]);
 assertJSONEqual(parseArgs(`'he"ll"o' "he'll'o2"`), [`he"ll"o`, `he'll'o2`]);
